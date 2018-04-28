@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+from flask import Flask
+
 
 def PageScrape():
 
@@ -23,7 +25,7 @@ def PageScrape():
 
 	pElement[title[0].get_text()] = subtitles
 
-	print (pElement)
+       #print (pElement)
 
 	
 	Dsc = []
@@ -34,4 +36,3 @@ def PageScrape():
 		#print x
 
 	return pElement
-PageScrape()

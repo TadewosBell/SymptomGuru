@@ -1,4 +1,6 @@
 from flask import Flask, jsonify
+from flask_pymongo import PyMongo
+from mongo_connect import mongo 
 
 from Surgeries import PageScrape
 
