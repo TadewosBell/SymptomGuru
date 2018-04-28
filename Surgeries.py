@@ -15,7 +15,7 @@ subtitles = soup.find_all('h2')
 
 print(subtitles)
 
-Desc = []
+Dsc = []
 #for i in subtitles:
 #	Desc.append(soup.find(text = i.get_text()).findNext('p').contents)
 
