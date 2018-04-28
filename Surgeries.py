@@ -1,23 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
 
-page = requests.get("http://www.rightdiagnosis.com/surgery/abdominal-liposuction.htm")
 
-soup = BeautifulSoup(page.content, 'html.parser')
+def PageScrape():
 
-procedure = soup.find(id='wd_content')
+	page = requests.get("http://www.rightdiagnosis.com/surgery/abdominal-liposuction.htm")
 
-title = soup.findAll('h1')
+	soup = BeautifulSoup(page.content, 'html.parser')
 
-print(title)
+	procedure = soup.find(id='wd_content')
 
-subtitles = soup.find_all('h2')
+	title = soup.findAll('h1')
 
-print(subtitles)
+	pElement = {}
 
-Dsc = []
-#for i in subtitles:
-#	Desc.append(soup.find(text = i.get_text()).findNext('p').contents)
+	subtitlesW = soup.find_all('h2')
+	
+	subtitles = []
+	
+	for i in subtitlesW:
+		subtitles.append(i.get_text())
 
-#for x in Desc:
-	#print x
+	pElement[title[0].get_text()] = subtitles
+
+	print (pElement)
+
+	
+	Dsc = []
+	#for i in subtitles:
+		#	Desc.append(soup.find(text = i.get_text()).findNext('p').contents)
+
+	#for x in Desc:
+		#print x
+
+	return pElement
+PageScrape()
