@@ -1,38 +1,61 @@
 import requests
 from bs4 import BeautifulSoup
+import re
+from lxml import html
+from flask import Flask, jsonify
+from flask_pymongo import PyMongo
+import json
 
-from flask import Flask
+surgeries = {}
 
+def PageScrape(link):
 
-def PageScrape():
-
-	page = requests.get("http://www.rightdiagnosis.com/surgery/abdominal-liposuction.htm")
-
-	soup = BeautifulSoup(page.content, 'html.parser')
-
-	procedure = soup.find(id='wd_content')
-
-	title = soup.findAll('h1')
-
-	pElement = {}
-
-	subtitlesW = soup.find_all('h2')
+	Baseurl = "http://www.rightdiagnosis.com"
 	
-	subtitles = []
+	url = Baseurl + link
+	page = requests.get(url)
+
+	tree = html.fromstring(page.content)
+
+	diseaseTreated(tree)
+
+def diseaseTreated(tree):
 	
-	for i in subtitlesW:
-		subtitles.append(i.get_text())
-
-	pElement[title[0].get_text()] = subtitles
-
-       #print (pElement)
-
+	title = tree.xpath('//*[@id="wd_content"]/h1')
 	
-	Dsc = []
-	#for i in subtitles:
-		#	Desc.append(soup.find(text = i.get_text()).findNext('p').contents)
+	procedure = tree.xpath('//*[@id="wd_content"]/ul[1]/li')
 
-	#for x in Desc:
-		#print x
+	proceduresLink = tree.xpath('//*[@id="wd_content"]/ul[1]/li/a')
 
-	return pElement
+	name = title[0].text
+
+	text = []
+	for i in procedure:
+		if i.text != None:
+			text.append(re.sub('\n','',i.text))
+
+	for i in proceduresLink:
+		if i !=None:
+			text.append(re.sub('\n','',i.text))
+
+	for i in text:
+		print(i)
+	
+	surgeries[name] = text
+
+def allLinks():
+
+	page = requests.get("http://www.rightdiagnosis.com/lists/surgery.htm")
+
+	tree = html.fromstring(page.content)
+
+	names = tree.xpath('//*[@id="wd_content"]/ul/li/a')
+	
+	links = tree.xpath('//*[@id="wd_content"]/ul/li/a/@href')
+
+	for i in links:
+		#print(links[i])
+		PageScrape(str(i))
+
+	return surgeries
+
