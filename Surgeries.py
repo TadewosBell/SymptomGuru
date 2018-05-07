@@ -22,27 +22,60 @@ def PageScrape(link):
 def diseaseTreated(tree):
 	
 	title = tree.xpath('//*[@id="wd_content"]/h1')
-	
-	procedure = tree.xpath('//*[@id="wd_content"]/ul[1]/li')
 
-	proceduresLink = tree.xpath('//*[@id="wd_content"]/ul[1]/li/a')
+	h2 = tree.xpath('//*[@id="wd_content"]/h2')
+
+	conditions = tree.xpath('//*[@id="wd_content"]/ul[1]/li')
+
+	conditionsLink = tree.xpath('//*[@id="wd_content"]/ul[1]/li/a')
 
 	name = title[0].text
 
-	text = []
-	for i in procedure:
+	conditionsList = []
+	conditionsList.append("Diseases and Conditions")
+	for i in conditions:
 		if i.text != None:
-			text.append(re.sub('\n','',i.text))
+			conditionsList.append(re.sub('\n','',i.text))
+	subtitles = []
+	for i in h2:
+		if i.text != None:
+			subtitles.append(i.text)
 
-	for i in proceduresLink:
-		if i !=None:
-			text.append(re.sub('\n','',i.text))
-
-	for i in text:
-		print(i)
+	search = ['Diseases And Conditions Treated','Non-Surgical Options','Other Surgical Options','Procedure Complications','Anesthetic Requirements']
+	cntr = 0
+	matchText = []
+	data = []
+	for subs in subtitles:
+		for j in search:
+			result = re.match(j,subs)
+			if result != None:
+				#print(result.group(0))
+				matchText = []
+				matchText.append(result.group(0))
+				path = '//*[@id="wd_content"]/ul[' + str(cntr) + ']/li'
+				match = tree.xpath(path)
+				for i in match:
+					if i.text != None:
+						matchText.append(re.sub('\n','',i.text))
+				path2 = '//*[@id="wd_content"]/ul[' + str(cntr) + ']/li/a'
+				match2 = tree.xpath(path2)
+				for i in match2:
+					if i.text != None:
+						matchText.append(re.sub('\n','',i.text)) 
+				data.append(matchText)
+		
+		cntr = cntr + 1		
 	
-	surgeries[name] = text
 
+	for i in conditionsLink:
+		if i != None:
+			conditionsList.append(re.sub('\n','',i.text))
+
+	#	print(name,":",subtitles)
+
+
+	surgeries[name] = data
+	
 def allLinks():
 
 	page = requests.get("http://www.rightdiagnosis.com/lists/surgery.htm")
@@ -58,4 +91,5 @@ def allLinks():
 		PageScrape(str(i))
 
 	return surgeries
+
 

@@ -17,7 +17,7 @@ def add():
 	for key,values in surgeries.items():
 		procedures.insert({
 				'name':(str(key)).strip(),
-				'conditions':str(values)})  
+				'information':str(values)})  
 	return 'Success'
 @app.route('/search')
 def student():
